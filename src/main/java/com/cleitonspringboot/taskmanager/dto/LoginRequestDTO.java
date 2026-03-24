@@ -2,37 +2,22 @@ package com.cleitonspringboot.taskmanager.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
-public class RegisterRequestDTO {
-
-    @NotBlank(message = "O nome é obrigatório")
-    @Size(min = 3, max = 120, message = "O nome deve ter entre 3 e 120 caracteres")
-    private String name;
+public class LoginRequestDTO {
 
     @NotBlank(message = "O email é obrigatório")
     @Email(message = "Email inválido")
     private String email;
 
     @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 6, max = 100, message = "A senha deve ter entre 6 e 100 caracteres")
     private String password;
 
-    public RegisterRequestDTO() {
+    public LoginRequestDTO() {
     }
 
-    public RegisterRequestDTO(String name, String email, String password) {
-        this.name = name;
+    public LoginRequestDTO(String email, String password) {
         this.email = email;
         this.password = password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getEmail() {
