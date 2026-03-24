@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cleitonspringboot.taskmanager.dto.UserResponseDTO;
 import com.cleitonspringboot.taskmanager.entity.User;
 import com.cleitonspringboot.taskmanager.exception.BusinessException;
 import com.cleitonspringboot.taskmanager.repository.UserRepository;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> me() {
+    public ResponseEntity<UserResponseDTO> me() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (!(principal instanceof SecurityUserDetails)) {
@@ -34,8 +35,12 @@ public class UserController {
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
 
-        user.setPassword(null);
+        UserResponseDTO dto = new UserResponseDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole().name());
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(dto);
     }
 }

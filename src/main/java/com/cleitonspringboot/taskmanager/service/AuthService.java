@@ -21,15 +21,18 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final LogService logService;
 
     public AuthService(UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            AuthenticationManager authenticationManager) {
+            AuthenticationManager authenticationManager,
+            LogService logService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.logService = logService;
     }
 
     public AuthResponseDTO register(RegisterRequestDTO dto) {
@@ -44,6 +47,8 @@ public class AuthService {
         user.setRole(Role.ROLE_USER);
 
         User savedUser = userRepository.save(user);
+
+        logService.info("REGISTER", savedUser.getEmail(), "Novo usuário cadastrado");
 
         String token = jwtService.generateToken(savedUser);
 
@@ -62,6 +67,8 @@ public class AuthService {
 
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
+
+        logService.info("LOGIN", user.getEmail(), "Usuário autenticado com sucesso");
 
         String token = jwtService.generateToken(user);
 

@@ -21,10 +21,12 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final LogService logService;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, LogService logService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.logService = logService;
     }
 
     public TaskResponseDTO create(TaskRequestDTO dto) {
@@ -45,6 +47,8 @@ public class TaskService {
 
         Task savedTask = taskRepository.save(task);
 
+        logService.info("CREATE_TASK", user.getEmail(), "Tarefa criada com id " + savedTask.getId());
+
         return toResponseDTO(savedTask);
     }
 
@@ -52,6 +56,15 @@ public class TaskService {
         User user = getAuthenticatedUser();
 
         return taskRepository.findByUser(user)
+                .stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<TaskResponseDTO> findByStatus(TaskStatus status) {
+        User user = getAuthenticatedUser();
+
+        return taskRepository.findByUserAndStatus(user, status)
                 .stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
@@ -82,6 +95,8 @@ public class TaskService {
 
         Task updatedTask = taskRepository.save(task);
 
+        logService.info("UPDATE_TASK", user.getEmail(), "Tarefa atualizada com id " + updatedTask.getId());
+
         return toResponseDTO(updatedTask);
     }
 
@@ -90,6 +105,8 @@ public class TaskService {
 
         Task task = taskRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new BusinessException("Tarefa não encontrada"));
+
+        logService.info("DELETE_TASK", user.getEmail(), "Tarefa removida com id " + task.getId());
 
         taskRepository.delete(task);
     }

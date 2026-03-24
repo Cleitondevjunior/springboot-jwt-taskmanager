@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.cleitonspringboot.taskmanager.dto.TaskRequestDTO;
 import com.cleitonspringboot.taskmanager.dto.TaskResponseDTO;
+import com.cleitonspringboot.taskmanager.enums.TaskStatus;
 import com.cleitonspringboot.taskmanager.service.TaskService;
 
 import jakarta.validation.Valid;
@@ -30,6 +31,11 @@ public class TaskController {
     @GetMapping
     public ResponseEntity<List<TaskResponseDTO>> findAll() {
         return ResponseEntity.ok(taskService.findAllFromAuthenticatedUser());
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<TaskResponseDTO>> findByStatus(@PathVariable TaskStatus status) {
+        return ResponseEntity.ok(taskService.findByStatus(status));
     }
 
     @GetMapping("/{id}")
